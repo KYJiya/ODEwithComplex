@@ -34,7 +34,7 @@ if __name__=="__main__":
             vs_imag = us[:, 0].imag
 
             temp = pd.DataFrame(data=[[r, i, vs_real, vs_imag]], columns=result.columns)
-            result = pd.concat([result, temp])
+            result = pd.concat([result, temp], ignore_index=True)
 
     print(result)
 
