@@ -6,6 +6,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from odeintw import odeintw
 import numpy as np
 import pandas as pd
+import os
 
 
 def f(v, s, k, l):
@@ -16,12 +17,21 @@ def f(v, s, k, l):
     return (v[1], -3*v[1] - (k**2)*v[0])
 
 
+def createDirectory(directory):
+    try:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+    except OSError:
+        print("Error: Failed to create the directory.")
+
+
 if __name__=="__main__":
     '''
     이 값을 바꿔서 real과 image값을 조절 (최소값, 최대값, 간격)
     k_r_index: real part
     k_i_index: image part
     '''
+    createDirectory("data")
     k_r_index = np.linspace(0.001, 15, 999)
     k_i_index = [0.1, 1, 2]
     # k_i_index = np.linspace(0.1, 0.1, 1)
