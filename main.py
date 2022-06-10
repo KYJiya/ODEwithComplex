@@ -2,9 +2,11 @@ import matplotlib
 from tqdm import tqdm
 from matplotlib import pyplot as plt
 from scipy.integrate import odeint
+from mpl_toolkits.mplot3d import Axes3D
 from odeintw import odeintw
 import numpy as np
 import pandas as pd
+
 
 def f(v, s, k, l):
     '''
@@ -20,32 +22,47 @@ if __name__=="__main__":
     k_r_index: real part
     k_i_index: image part
     '''
-    k_r_index = np.linspace(1, 15, 15)
-    k_i_index = np.linspace(1, 15, 15)
+    k_r_index = np.linspace(0.001, 15, 999)
+    k_i_index = [0.1, 1, 2]
+    # k_i_index = np.linspace(0.1, 0.1, 1)
 
-    result = pd.DataFrame(columns=['i_index', 'j_index', 'real_value', 'imag_value'])
+    result = pd.DataFrame(columns=['r_index', 'i_index', 'real_value', 'imag_value'])
 
-    for r in tqdm(k_r_index):
-        for i in tqdm(k_i_index, leave=False):
+    for i in tqdm(k_i_index):
+        for r in tqdm(k_r_index, leave=False):
             v0 = [complex(0,0), complex(1,0)]
             ss = np.linspace(0, 1, 200)
             us, infodict = odeintw(f, v0, ss, args=(complex(r,i),0), full_output=True)
-            vs_real = us[:, 0].real
-            vs_imag = us[:, 0].imag
+            vs_real = us[:, 0].real[-1]
+            vs_imag = us[:, 0].imag[-1]
 
             temp = pd.DataFrame(data=[[r, i, vs_real, vs_imag]], columns=result.columns)
             result = pd.concat([result, temp], ignore_index=True)
+            
+            if abs(vs_real) < 1e-3:
+                plt.plot(ss, us[:, 0].real, '-', label=f"{r:.2f}")
+                plt.xlabel('s')
+                plt.ylabel('V(s)')
+
+        plt.legend()
+        plt.savefig(f"data/{i}i.png")
+        plt.clf()
 
     print(result)
+    result.to_csv("data/result.csv")
 
-    # matplotlib.rc('text', usetex=True)
-    # plt.plot(ss,result["imag_value"][0],'-')
-    # plt.plot(ss,result["imag_value"][0],'r*')
+    # plt.plot(ss,result["real_value"],'-')
     # plt.xlabel('s')
-    # plt.ylabel('V(s)')
-    # plt.title(f'k = {i}+{j}'+'$\it{i}$')
-    # plt.savefig("data/mygraph.png")
+    # plt.ylabel('V(1)')
+    # plt.savefig("data/mygraph_real.png")
 
+    # plt.plot(result["i_index"],result["imag_value"],'-')
+    # plt.xlabel('s')
+    # plt.ylabel('V(1)')
+    # plt.savefig("data/mygraph_imag.png")
+
+
+    # plt.title(f'k = {r}+{j}'+'$\it{i}$')
     # i = complex(i, j)
     # if abs(vs[-1]) < 4e-05:
     #     print(i, j, vs[-1])
