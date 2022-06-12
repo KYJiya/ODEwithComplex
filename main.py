@@ -38,10 +38,11 @@ if __name__=="__main__":
 
     result = pd.DataFrame(columns=['r_index', 'i_index', 'real_value', 'imag_value'])
 
+    v0 = [complex(0,0), complex(1,0)]
+    ss = np.linspace(0, 1, 200)
+    
     for i in tqdm(k_i_index):
         for r in tqdm(k_r_index, leave=False):
-            v0 = [complex(0,0), complex(1,0)]
-            ss = np.linspace(0, 1, 200)
             us, infodict = odeintw(f, v0, ss, args=(complex(r,i),0), full_output=True)
             vs_real = us[:, 0].real[-1]
             vs_imag = us[:, 0].imag[-1]
