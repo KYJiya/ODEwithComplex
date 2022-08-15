@@ -50,7 +50,9 @@ if __name__=="__main__":
             temp = pd.DataFrame(data=[[r, i, vs_real, vs_imag]], columns=result.columns)
             result = pd.concat([result, temp], ignore_index=True)
             
+            # 0과 가까운 값일 때 그래프를 그리도록
             if abs(vs_real) < 1e-3:
+            # TODO: 값이 음수에서 양수로 양수에서 음수로 바뀔 때 그래프를 그리도록
                 plt.plot(ss, us[:, 0].real, '-', label=f"{r:.2f}")
                 plt.xlabel('s')
                 plt.ylabel('V(s)')
