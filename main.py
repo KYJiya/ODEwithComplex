@@ -41,6 +41,15 @@ if __name__=="__main__":
     v0 = [complex(0,0), complex(1,0)]
     ss = np.linspace(0, 1, 200)
     
+    # for define "before"
+    us, infodict = odeintw(f, v0, ss, args=(complex(k_r_index[0],k_i_index[0]),0), full_output=True)
+    vs_real = us[:, 0].real[-1]
+    vs_imag = us[:, 0].imag[-1]
+
+    temp = pd.DataFrame(data=[[k_r_index[0], k_i_index[0], vs_real, vs_imag]], columns=result.columns)
+    result = pd.concat([result, temp], ignore_index=True)
+
+    before = vs_real
     for i in tqdm(k_i_index):
         for r in tqdm(k_r_index, leave=False):
             us, infodict = odeintw(f, v0, ss, args=(complex(r,i),0), full_output=True)
@@ -51,11 +60,14 @@ if __name__=="__main__":
             result = pd.concat([result, temp], ignore_index=True)
             
             # 0과 가까운 값일 때 그래프를 그리도록
-            if abs(vs_real) < 1e-3:
+            # if abs(vs_real) < 1e-3:
             # TODO: 값이 음수에서 양수로 양수에서 음수로 바뀔 때 그래프를 그리도록
+            if np.sign(before) != np.sign(vs_real):
                 plt.plot(ss, us[:, 0].real, '-', label=f"{r:.2f}")
                 plt.xlabel('s')
                 plt.ylabel('V(s)')
+
+            before = vs_real
 
         plt.legend()
         plt.savefig(f"data/{i}i.png")
